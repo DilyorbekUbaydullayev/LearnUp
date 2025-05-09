@@ -1,29 +1,23 @@
-// middleware.ts
-import { clerkMiddleware } from '@clerk/nextjs/server';
-import createIntlMiddleware from 'next-intl/middleware';
-import { NextRequest, NextFetchEvent } from 'next/server';
+import { authMiddleware } from '@clerk/nextjs'
+import createMiddleware from 'next-intl/middleware'
 
+const intlMiddleware = createMiddleware({
+	locales: ['en', 'ru', 'uz', 'tr'],
+	defaultLocale: 'en',
+})
 
-const intlMiddleware = createIntlMiddleware({
-  locales: ['en', 'ru', 'uz', 'tr'],
-  defaultLocale: 'en',
-});
-
-export default function middleware(
-  req: NextRequest,
-  event: NextFetchEvent
-) {
-  
-  const res = intlMiddleware(req);
-  if (res) return res;
-
-  
-  return clerkMiddleware()(req, event);
-}
+export default authMiddleware({
+	beforeAuth: req => intlMiddleware(req),
+	publicRoutes: [
+		'/:lng',
+		'/:lng/courses',
+		'/:lng/courses/:slug',
+		'/:lng/blogs',
+		'/:lng/blogs/:slug',
+		'/:lng/contacts',
+	],
+})
 
 export const config = {
-  matcher: [
-    '/((?!_next|.*\\..*).*)',
-    '/(api|trpc)(.*)',
-  ],
-};
+	matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+}

@@ -5,6 +5,7 @@ import { languages } from '@/i18n/settings'
 import { dir } from 'i18next'
 import { ClientProviders } from './providers'   // ← yangi fayl
 import { ChildProps } from '@/types'
+import { Toaster } from '@/components/ui/sonner'
 
 const roboto = Roboto({
   subsets: ['latin', 'cyrillic'],
@@ -25,7 +26,10 @@ export async function generateStaticParams() {
 export const metadata: Metadata = {
   title: 'LearnUp',
   description: "Startup Praktikum's Next.js project",
-  icons: { icon: '/logo.svg' },
+   icons: {
+    icon: '/logo.svg',      
+    shortcut: '/logo.svg',
+  },
 }
 
 interface Props extends ChildProps {
@@ -40,6 +44,7 @@ export default function RootLayout({ children, params: { lng } }: Props) {
         suppressHydrationWarning
       >
         <ClientProviders lng={lng}>
+          <Toaster position='top-center'/>
           {children}
         </ClientProviders>
       </body>

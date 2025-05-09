@@ -13,14 +13,22 @@ import Image from 'next/image'
 import { lngs } from '@/constants'
 import Link from 'next/link'
 import { cn, getCurrentLng } from '@/lib/utils'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname, useSearchParams } from 'next/navigation'
 
 interface Props {
 	isMobile?: boolean
 }
 
 function LanguageDropdown({ isMobile = false }: Props) {
-	const { lng } = useParams()
+	const { lng } = useParams()               
+	const pathname = usePathname() || '/'    
+	const search = useSearchParams().toString()
+  
+	const segments = pathname.split('/').filter(Boolean)
+	if (lng && segments[0] === lng) segments.shift()
+	const restPath = '/' + segments.join('/')  
+	const makeHref = (locale: string) =>
+	  `/${locale}${restPath}${search ? '?' + search : ''}`
 
 	return (
 		<DropdownMenu>
@@ -32,7 +40,7 @@ function LanguageDropdown({ isMobile = false }: Props) {
 						isMobile && 'w-full bg-primary hover:bg-primary/80 h-12'
 					)}
 				>
-					<Languages />
+					<Languages /> 
 					{isMobile && (
 						<span className='ml-2 font-space-grotesk font-medium'>
 							{getCurrentLng(lng as string)}
@@ -43,7 +51,7 @@ function LanguageDropdown({ isMobile = false }: Props) {
 			<DropdownMenuContent className='w-56'>
 				<DropdownMenuGroup>
 					{lngs.map(item => (
-						<Link key={item.route} href={`/${item.route}`}>
+						<Link key={item.route} href={makeHref(item.route)}>
 							<DropdownMenuItem
 								className={cn(
 									'cursor-pointer',
